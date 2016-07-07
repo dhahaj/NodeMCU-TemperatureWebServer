@@ -1,0 +1,6 @@
+{
+  "name": "Temperaturewebserver",
+  "tagline": "",
+  "body": "﻿# arduino\r\nTemperatureWebServer - Web server on an ESp8266 for monitoring the ambient temperature.",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
