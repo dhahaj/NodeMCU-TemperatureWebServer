@@ -96,7 +96,8 @@ void handleFileDelete() {
   path = String();
 }
 
-void handleFileCreate() {
+void handleFileCreate()
+{
   if (server.args() == 0)
     return server.send(500, "text/plain", "BAD ARGS");
   String path = server.arg(0);
@@ -114,8 +115,10 @@ void handleFileCreate() {
   path = String();
 }
 
-void handleFileList() {
-  if (!server.hasArg("dir")) {
+void handleFileList() 
+{
+  if (!server.hasArg("dir")) 
+  {
     server.send(500, "text/plain", "BAD ARGS");
     return;
   }
