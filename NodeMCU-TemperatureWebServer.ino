@@ -26,10 +26,10 @@ void setupAP(void);
 
 const char* host = "esp8266-weather";
 const char* update_path = "/update";
-const char* update_username = "";
-const char* update_password = "";
-const char *ssid = "";
-const char *password = "";
+const char* update_username = "daniel";
+const char* update_password = "jnco";
+const char *ssid = "fkyall";
+const char *password = "%%jnco5626%%";
 
 const char thingSpeakAddress[] = "api.thingspeak.com";
 String APIKey = "EX2W4F4J2DBU9O90";	//enter your channel's Write API Key
@@ -310,7 +310,8 @@ void handleNotFound() {
 void bmpSample() {
   float temp(NAN), alt(NAN), pres(NAN);
   temp = (bmp.readTemperature() * 1.8 + 32.0),  pres = bmp.readPressure(), alt = bmp.readAltitude();
-  temp_str = (temp, 1), alt_str = (alt, 1), pres_str = (pres, 1);
+  temp_str = (temp), alt_str = (alt), pres_str = (pres);
+  temp_str = temp_str.substring(0, temp_str.length() - 1); //, alt_str = (alt), pres_str = (pres);
   //stream << "Temperature: " << temp_str << "F" << endl << "Altitude: " << alt_str << "m" << endl << "Pressure: " << pres_str << "pas" << endl;
 }
 
