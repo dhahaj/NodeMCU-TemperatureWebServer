@@ -1,88 +1,73 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-  <title>ESP Monitor</title>
-  <script type="text/javascript" src="graphs.js"></script>
-  <script type="text/javascript">
-    var heap,temp,digi;
-    var reloadPeriod = 1000;
-    var running = false;
-    
-    function loadValues(){
-      if(!running)
-		return;
-      
-	  var xh = new XMLHttpRequest();
-      xh.onreadystatechange = function()
-	  {
-        if (xh.readyState == 4)
-		{
-          if(xh.status == 200)
-		  {
-            var res = JSON.parse(xh.responseText);
-            heap.add(res.heap);
-            temp.add(res.analog);
-            digi.add(res.gpio);
-            if(running)
-				setTimeout(loadValues, reloadPeriod*2);
-          } else running = false;
-        }
-      };
-      xh.open("GET", "/all", true);
-      xh.send(null);
-    };
-    
-    function run()
-	{
-      if(!running){
-        running = true;
-        loadValues();
-      }
-    }
-    
-    function onBodyLoad()
-	{
-      var refreshInput = document.getElementById("refresh-rate");
-      refreshInput.value = reloadPeriod;
-      refreshInput.onchange = function(e){
-        var value = parseInt(e.target.value);
-        reloadPeriod = (value > 0)?value:0;
-        e.target.value = reloadPeriod;
-      }
-      var stopButton = document.getElementById("stop-button");
-      stopButton.onclick = function(e){
-        running = false;
-      }
-      var startButton = document.getElementById("start-button");
-      startButton.onclick = function(e){
-        run();
-      }
-      
-      // Example with 10K thermistor
-      function calcThermistor(v) {
-        var t = Math.log(((10230000 / v) - 10000));
-        t = (1/(0.001129148+(0.000234125*t)+(0.0000000876741*t*t*t)))-273.15;
-        return (t>120)?0:Math.round(t*10)/10;
-      }
-      temp = createGraph(document.getElementById("temp"), "Temperature", 100, 128, 10, 40, false, "cyan", calcThermistor);
-      
-      temp = createGraph(document.getElementById("analog"), "Analog Input", 100, 128, 0, 1023, false, "cyan");
-      heap = createGraph(document.getElementById("heap"), "Current Heap", 100, 125, 0, 30000, true, "orange");
-      digi = createDigiGraph(document.getElementById("digital"), "GPIO", 100, 146, [0, 4, 5, 16], "gold");
-      run();
-    }
-  </script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<meta charset="utf-8"/>
+<meta http-equiv="refresh" content="21600">
+<title>Weather Station</title>
+<script>
+var connection = new WebSocket('ws://' + location.hostname + ':8889/', ['arduino']);
+connection.onmessage = function (e) {
+	console.log('Server: ', e.data);
+	if (e.data.slice(0, 2) == "1:")
+		document.getElementById('ActUptime').value = e.data.slice(2);
+	if (e.data.slice(0, 2) == "2:")
+		document.getElementById('ActTemp').value = e.data.slice(2);
+	if (e.data.slice(0, 2) == "3:")
+		document.getElementById('ActAlt').value = e.data.slice(2);
+	if (e.data.slice(0, 2) == "4:")
+		document.getElementById('ActPres').value = e.data.slice(2);
+}
+
+connection.onclose = function () {
+	console.log('closed!');
+	check();
+}
+
+function check() {
+	if (!connection || connection.readyState == 3)
+		setInterval(check, 5000);
+}
+</script>
+<style>
+ body { 
+   /*background-color: blue; */
+   font-family: Arial, Helvetica, Sans-Serif;
+   font-size: 115%;
+   /*Color: #ffffff; */
+ }
+ a { 
+   text-decoration: none; 
+   color: #d3d3d3; 
+  }
+  table {
+    padding: 10px;
+    /*margin: 20px;*/
+  }
+</style>
 </head>
-<body id="index" style="margin:0; padding:0;" onload="onBodyLoad()">
-  <div id="controls" style="display: block; border: 1px solid rgb(68, 68, 68); padding: 5px; margin: 5px; width: 362px; background-color: rgb(238, 238, 238);">
-    <label>Period (ms):</label>
-    <input type="number" id="refresh-rate"/>
-    <input type="button" id="start-button" value="Start"/>
-    <input type="button" id="stop-button" value="Stop"/>
-  </div>
-  <div id="heap"></div>
-  <div id="analog"></div>
-  <div id="digital"></div>
+<body>
+<div class="w3-display-container" style="height:300px;">
+  <table class="w3-centered w3-border w3-blue">
+    <tbody>
+  <tr class="w3-hover-text-red">
+		<td colspan = "3" align="center"><a href="history.html" target="_new">Temperature<br></a><font size="+4"><output name="ActTemp" id="ActTemp"></output> &deg;F</font><p></td>
+	</tr>
+	<tr class="w3-hover-text-red">
+        <td align="left"><a href="history.html" target="_new">Altitude<br></a><font size="+2"><output name="ActAlt" id="ActAlt"></output> meters</font><p></td>
+        <td align="right"><a href="history.html" target="_new">Pressure<br></a><font size="+2"><output name="ActPres" id="ActPres"></output> pascal</font><p></td></tr>
+	<tr><td colspan="3" align="center">Uptime: <output name="ActUptime" id="ActUptime"></output><p></td></tr>
+	<tr width="250">
+	<td colspan="3">
+	<div class="w3-display-container" >
+          <a href="https://www.weatherforyou.com/weather/tx/new%20braunfels.html" target="_new">
+          <img src="https://www.weatherforyou.net/fcgi-bin/hw3/hw3.cgi?config=png&forecast=zone&alt=hwizone7day5&place=new%20braunfels&state=tx&country=us&hwvbg=black&hwvtc=white&hwvdisplay=&daysonly=2&maxdays=7" width="500" height="200" border="0" alt="new%20braunfels, tx, weather forecast"></a>
+	</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </body>
 </html>
