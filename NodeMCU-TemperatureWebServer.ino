@@ -311,7 +311,7 @@ void bmpSample() {
   float temp(NAN), alt(NAN), pres(NAN);
   temp = (bmp.readTemperature() * 1.8 + 32.0),  pres = bmp.readPressure(), alt = bmp.readAltitude();
   temp_str = (temp), alt_str = (alt), pres_str = (pres);
-  temp_str = temp_str.substring(0, temp_str.length() - 1); //, alt_str = (alt), pres_str = (pres);
+  temp_str = temp_str.substring(0, temp_str.length() - 1), alt_str = alt_str.substring(0, alt_str.length() - 1), pres_str = pres_str.substring(0, pres_str.length() - 1);
   //stream << "Temperature: " << temp_str << "F" << endl << "Altitude: " << alt_str << "m" << endl << "Pressure: " << pres_str << "pas" << endl;
 }
 
