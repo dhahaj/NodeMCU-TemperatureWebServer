@@ -28,8 +28,8 @@ const char* host = "esp8266-weather";
 const char* update_path = "/update";
 const char* update_username = "daniel";
 const char* update_password = "jnco";
-const char *ssid = "fkyall";
-const char *password = "%%jnco5626%%";
+const char *ssid = "";
+const char *password = "";
 
 const char thingSpeakAddress[] = "api.thingspeak.com";
 String APIKey = "EX2W4F4J2DBU9O90";	//enter your channel's Write API Key
