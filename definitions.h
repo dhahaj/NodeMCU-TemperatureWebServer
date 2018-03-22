@@ -2,7 +2,22 @@
 #ifndef _DEFINITIONS_H_
 #define _DEFINITIONS_H_
 
-#define SEALEVELPRESSURE_HPA (1013.25)
+#include <ESP8266WiFi.h>
+#include <WiFiClient.h>
+#include <ESP8266WebServer.h>
+#include <PrintEx.h>
+
+StreamEx stream = Serial;
+using namespace ios;
+
+ESP8266WebServer server(8888);
+
+char* getipstr(void) {
+  static char cOut[20];
+  IPAddress ip = WiFi.localIP(); // the IP address of your esp
+  sprintf(cOut, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]); //also pseudocode.
+  return cOut;
+}
 
 const char WEBSOCKET_SCRIPT[] PROGMEM = "<script>\r\nvar connection = new WebSocket('ws://'+location.hostname+':8889/', ['arduino']);\r\n"
                                         "connection.onmessage = function(e){\r\n"
@@ -56,9 +71,37 @@ const char HISTORY[] PROGMEM = "<body>"
                                "<iframe width=\"450\" height=\"260\" style=\"border: 1px solid #cccccc;\""
                                " src=\"https://thingspeak.com/channels/455374/charts/4?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=40&title=Humidity&type=line\">"
                                "</iframe>\r\n"
-                               //                               "<iframe width=\"450\" height=\"260\" style=\"border: 1px solid #cccccc;\" "
-                               //                               "src=\"https://thingspeak.com/channels/455374/maps/channel_show\">"
-                               //                               "</iframe>\r\n"
+                               // "<iframe width=\"450\" height=\"260\" style=\"border: 1px solid #cccccc;\" "
+                               // "src=\"https://thingspeak.com/channels/455374/maps/channel_show\">"
+                               // "</iframe>\r\n"
                                "</body>\r\n</html>\r\n";
+
+
+//-----------------------------------------------------WEBPAGE HTTP ROOT---------------------------------------------------
+void http_root(void)
+{
+  String sResponse;
+  sResponse = FPSTR(HEAD_BEGIN);
+  sResponse += FPSTR(WEBSOCKET_SCRIPT);
+  sResponse.replace("[IP]", getipstr());
+  sResponse += FPSTR(TITLE);
+  sResponse.replace("[TITLE]", "Home Weather Station");
+  sResponse += FPSTR(STYLE);
+  sResponse += FPSTR(HEAD_END);
+  sResponse += FPSTR(RESPONSE);
+  server.send ( 200, "text/html", sResponse );
+  stream << F("Client disonnected") << endl;
+}
+
+//------------------------------------------------------WEBPAGE HTTP HISTORY-------------------------------------------------
+void http_history(void)
+{
+  String sResponse;
+  sResponse = FPSTR(HEAD_BEGIN);
+  sResponse += FPSTR(HEAD_END);
+  sResponse += FPSTR(HISTORY);
+  server.send ( 200, "text/html", sResponse );
+  stream << F("Client disonnected") << endl;
+}
 
 #endif
